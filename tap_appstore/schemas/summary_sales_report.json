@@ -1,0 +1,178 @@
+{
+  "type": [
+    "null",
+    "object"
+  ],
+  "properties": {
+    "provider": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "provider_country": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "sku": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "developer": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "title": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "version": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "product_type_identifier": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "units": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "developer_proceeds": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "begin_date": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "end_date": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "customer_currency": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "country_code": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "currency_of_proceeds": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "apple_identifier": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "customer_price": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "promo_code": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "parent_identifier": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "subscription": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "period": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "category": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "cmb": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "device": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "supported_platforms": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "proceeds_reason": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "preserved_pricing": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "client": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "order_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  }
+}
