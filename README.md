@@ -4,7 +4,7 @@ This is a [Singer](https://singer.io) tap that produces JSON-formatted
 data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md) 
 from App Store Connect API results.
 
-Sample config to calculate daily online peak:
+Sample config:
 ```$json
 {
   "key_id": "AAAAAAAAA",
