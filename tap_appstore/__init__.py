@@ -105,7 +105,7 @@ def discover():
     return {'streams': streams}
 
 
-def tsv_to_list(tsv, column_name_modifier = None):
+def tsv_to_list(tsv):
     lines = tsv.split('\n')
     header = [s.lower().replace(' ', '_') for s in lines[0].split('\t')]
 
@@ -147,12 +147,23 @@ def query_report(api):
     extraction_time = singer.utils.now()
 
     iterator = bookmark
+    singer.write_bookmark(
+        Context.state,
+        stream_name,
+        'start_date',
+        iterator.strftime(BOOKMARK_DATE_FORMAT)
+    )
+
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
         while iterator + delta <= extraction_time:
 
             iterator_str = iterator.strftime("%Y-%m-%d")
             rep_tsv = api.sales_report('SALES', 'SUMMARY', 'DAILY', Context.config['vendor'], iterator_str, '1_0')
-            rep = tsv_to_list(rep_tsv)
+            if isinstance(rep_tsv, dict):
+                LOGGER.warning("Received a JSON response instead of the report: %s", str(rep_tsv))
+                break
+            else:
+                rep = tsv_to_list(rep_tsv)
 
             for index, line in enumerate(rep, start=1):
                 data = line
@@ -171,11 +182,10 @@ def query_report(api):
                 Context.state,
                 stream_name,
                 'start_date',
-                iterator.strftime(BOOKMARK_DATE_FORMAT)
+                (iterator + delta).strftime(BOOKMARK_DATE_FORMAT)
             )
 
             singer.write_state(Context.state)
-
             iterator += delta
 
     singer.write_state(Context.state)
