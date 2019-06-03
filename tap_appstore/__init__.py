@@ -140,7 +140,8 @@ def query_report(api):
     catalog_entry = Context.get_catalog_entry(stream_name)
     stream_schema = catalog_entry['schema']
 
-    bookmark = datetime.fromisoformat(get_bookmark(stream_name)).replace(tzinfo=pytz.UTC)
+    # bookmark = datetime.fromisoformat(get_bookmark(stream_name)).replace(tzinfo=pytz.UTC)
+    bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
     delta = timedelta(days=1)
 
     extraction_time = singer.utils.now()
