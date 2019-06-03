@@ -4,6 +4,12 @@
     "object"
   ],
   "properties": {
+    "line_id": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
     "provider": {
       "type": [
         "null",

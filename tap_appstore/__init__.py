@@ -95,33 +95,9 @@ def discover():
             # TODO Events may have a different key property than this. Change
             # if it's appropriate.
             'key_properties': [
-                'provider',
-                'provider_country',
-                'sku',
-                'developer',
-                'title',
-                'version',
-                'product_type_identifier',
-                'developer_proceeds',
+                'line_id',  # artificial
                 'begin_date',
-                'end_date',
-                'customer_currency',
-                'country_code',
-                'currency_of_proceeds',
-                'apple_identifier',
-                'customer_price',
-                'promo_code',
-                'parent_identifier',
-                'subscription',
-                'period',
-                'category',
-                'cmb',
-                'device',
-                'supported_platforms',
-                'proceeds_reason',
-                'preserved_pricing',
-                'client',
-                'order_type'
+                'end_date'
             ]
         }
         streams.append(catalog_entry)
@@ -141,7 +117,7 @@ def tsv_to_list(tsv, column_name_modifier = None):
         line_cols = line.split('\t')
         for i, column in enumerate(header):
             if i < len(line_cols):
-                line_obj[column] = line_cols[i]
+                line_obj[column] = line_cols[i].strip()
         data.append(line_obj)
 
     return data
@@ -177,9 +153,9 @@ def query_report(api):
             rep_tsv = api.sales_report('SALES', 'SUMMARY', 'DAILY', Context.config['vendor'], iterator_str, '1_0')
             rep = tsv_to_list(rep_tsv)
 
-            for line in rep:
+            for index, line in enumerate(rep, start=1):
                 data = line
-
+                data['line_id'] = index
                 rec = transformer.transform(data, stream_schema)
 
                 singer.write_record(
