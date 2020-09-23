@@ -6,8 +6,9 @@ import os
 import json
 
 import singer
-from singer import utils, Transformer
-from singer import metadata
+from singer import utils, metadata, Transformer
+from singer.catalog import Catalog, CatalogEntry
+from singer.schema import Schema
 
 from appstoreconnect import Api
 import pytz
@@ -19,12 +20,28 @@ REQUIRED_CONFIG_KEYS = [
     'vendor',
     'start_date'
 ]
+
 STATE = {}
 
 LOGGER = singer.get_logger()
 
 BOOKMARK_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+TIME_EXTRACTED_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
+STREAMS_API_FIELDS = {
+    'subscription_event_report': {
+        'reportType': 'SUBSCRIPTION_EVENT',
+        'frequency': 'DAILY',
+        'reportSubType': 'SUMMARY',
+        'version': '1_2'
+    },
+    'subscriber_report': {
+        'reportType': 'SUBSCRIBER',
+        'frequency': 'DAILY',
+        'reportSubType': 'DETAILED',
+        'version': '1_2'
+    }
+}
 
 class Context:
     config = {}
@@ -92,13 +109,7 @@ def discover():
             'stream': schema_name,
             'tap_stream_id': schema_name,
             'schema': schema,
-            # TODO Events may have a different key property than this. Change
-            # if it's appropriate.
-            'key_properties': [
-                'line_id',  # artificial
-                'begin_date',
-                'end_date'
-            ]
+            'key_properties': []
         }
         streams.append(catalog_entry)
 
@@ -107,7 +118,8 @@ def discover():
 
 def tsv_to_list(tsv):
     lines = tsv.split('\n')
-    header = [s.lower().replace(' ', '_') for s in lines[0].split('\t')]
+    header = [s.lower().replace(' ', '_').replace('-','_')\
+        for s in lines[0].split('\t')]
 
     data = []
     for line in lines[1:]:
@@ -132,20 +144,17 @@ def sync(api):
         Context.new_counts[stream_name] = 0
         Context.updated_counts[stream_name] = 0
 
-    query_report(api)
+        query_report(api, catalog_entry)
 
 
-def query_report(api):
-    stream_name = 'summary_sales_report'
-    catalog_entry = Context.get_catalog_entry(stream_name)
+def query_report(api,catalog_entry):
+    stream_name = catalog_entry["tap_stream_id"]
     stream_schema = catalog_entry['schema']
 
-    # bookmark = datetime.fromisoformat(get_bookmark(stream_name)).replace(tzinfo=pytz.UTC)
-    bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=pytz.UTC)
+    # get bookmark from when data will be pulled
+    bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
     delta = timedelta(days=1)
-
-    extraction_time = singer.utils.now()
-
+    extraction_time = singer.utils.now().astimezone()
     iterator = bookmark
     singer.write_bookmark(
         Context.state,
@@ -155,19 +164,34 @@ def query_report(api):
     )
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
-        while iterator + delta <= extraction_time:
 
+
+        while iterator + delta <= extraction_time:
             iterator_str = iterator.strftime("%Y-%m-%d")
-            rep_tsv = api.sales_report('SALES', 'SUMMARY', 'DAILY', Context.config['vendor'], iterator_str, '1_0')
+            # setting report filters for each stream
+            report_filters = {
+                'reportDate': iterator_str,
+                'vendorNumber': "{}".format(Context.config['vendor'])
+                }
+            report_filters.update(STREAMS_API_FIELDS[stream_name])
+            
+            # fetch data from appstore api
+            rep_tsv = api.download_sales_and_trends_reports(filters=
+                report_filters)
+            
+            # parse api response
             if isinstance(rep_tsv, dict):
                 LOGGER.warning("Received a JSON response instead of the report: %s", str(rep_tsv))
                 break
             else:
                 rep = tsv_to_list(rep_tsv)
 
+            # write records
             for index, line in enumerate(rep, start=1):
                 data = line
-                data['line_id'] = index
+                data['_line_id'] = index
+                data['_time_extracted'] = extraction_time.strftime(TIME_EXTRACTED_FORMAT)
+                data['_api_report_date'] = iterator_str
                 rec = transformer.transform(data, stream_schema)
 
                 singer.write_record(
@@ -206,6 +230,7 @@ def main():
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
         catalog = discover()
+        Context.config = args.config
         print(json.dumps(catalog, indent=2))
 
     else:
@@ -217,7 +242,6 @@ def main():
 
         Context.config = args.config
         Context.state = args.state
-
         api = Api(
             Context.config['key_id'],
             Context.config['key_file'],

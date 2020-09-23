@@ -1,0 +1,186 @@
+{
+    "type": [
+        "null",
+        "object"
+    ],
+    "properties": {
+        "_line_id": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "_time_extracted": {
+            "type": [
+            "null",
+            "string"
+            ],
+            "format" : "date-time"
+        },
+        "_api_report_date": {
+            "type": [
+            "null",
+            "string"
+            ],
+            "format" : "date"
+        },
+        "event_date" : {
+            "type" : [
+                "null",
+                "string"
+            ],
+            "format": "date"
+        },
+        "app_name" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "app_apple_id" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_name" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_apple_id" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_group_id" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "standard_subscription_duration" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "promotional_offer_name" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "promotional_offer_id" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_offer_type" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_offer_duration" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "marketing_opt_in_duration" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "customer_price" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "customer_currency" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "developer_proceeds" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "proceeds_currency" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "preserved_pricing" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "proceeds_reason" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "client" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "device" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "country" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscriber_id" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "subscriber_id_reset" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "refund" : {
+            "type" : [
+                "null",
+                "string"
+            ]
+        },
+        "purchase_date" : {
+            "type" : [
+                "null",
+                "string"
+            ],
+            "format": "date"
+        },
+        "units" : {
+            "type" : [
+                "null",
+                "integer"
+            ]
+        }   
+    }
+}
