@@ -7,10 +7,9 @@ import json
 
 import singer
 from singer import utils, metadata, Transformer
-from singer.catalog import Catalog, CatalogEntry
-from singer.schema import Schema
 
 from appstoreconnect import Api
+from appstoreconnect.api import APIError
 import pytz
 
 REQUIRED_CONFIG_KEYS = [
@@ -28,7 +27,7 @@ LOGGER = singer.get_logger()
 BOOKMARK_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TIME_EXTRACTED_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
-STREAMS_API_FIELDS = {
+API_REQUEST_FIELDS = {
     'subscription_event_report': {
         'reportType': 'SUBSCRIPTION_EVENT',
         'frequency': 'DAILY',
@@ -40,6 +39,18 @@ STREAMS_API_FIELDS = {
         'frequency': 'DAILY',
         'reportSubType': 'DETAILED',
         'version': '1_2'
+    },
+    'subscription_report': {
+        'reportType': 'SUBSCRIPTION',
+        'frequency': 'DAILY',
+        'reportSubType': 'SUMMARY',
+        'version': '1_2'
+    },
+    'sales_report': {
+        'reportType': 'SALES',
+        'frequency': 'DAILY',
+        'reportSubType': 'SUMMARY',
+        'version': '1_0'
     }
 }
 
@@ -135,6 +146,24 @@ def tsv_to_list(tsv):
     return data
 
 
+def get_api_request_fields(report_date,stream_name):
+    """Get fields to be used in appstore API request """
+    report_filters = {
+        'reportDate': report_date,
+        'vendorNumber': "{}".format(Context.config['vendor'])
+        }
+
+    api_fields = API_REQUEST_FIELDS.get(stream_name)
+    if api_fields == None:
+        raise Exception('API request fields not set to stream "{}" '.\
+            format(stream_name))
+    else:
+        report_filters.update(API_REQUEST_FIELDS[stream_name])
+    
+    return report_filters
+
+
+
 def sync(api):
     # Write all schemas and init count to 0
     for catalog_entry in Context.catalog['streams']:
@@ -164,20 +193,19 @@ def query_report(api,catalog_entry):
     )
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
-
-
         while iterator + delta <= extraction_time:
             iterator_str = iterator.strftime("%Y-%m-%d")
+            LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, iterator_str)
             # setting report filters for each stream
-            report_filters = {
-                'reportDate': iterator_str,
-                'vendorNumber': "{}".format(Context.config['vendor'])
-                }
-            report_filters.update(STREAMS_API_FIELDS[stream_name])
+            report_filters = get_api_request_fields(iterator_str,stream_name)
             
             # fetch data from appstore api
-            rep_tsv = api.download_sales_and_trends_reports(filters=
-                report_filters)
+            try:
+                rep_tsv = api.download_sales_and_trends_reports(filters=
+                    report_filters)
+            except APIError as e:
+                LOGGER.error(e)
+                break
             
             # parse api response
             if isinstance(rep_tsv, dict):

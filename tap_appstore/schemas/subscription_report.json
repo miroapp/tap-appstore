@@ -1,13 +1,13 @@
 {
     "type": [
-      "null",
-      "object"
+        "null",
+        "object"
     ],
     "properties": {
         "_line_id": {
             "type": [
-            "null",
-            "integer"
+                "null",
+                "integer"
             ]
         },
         "_time_extracted": {
@@ -23,19 +23,6 @@
             "string"
             ],
             "format" : "date"
-        },
-        "event_date": {
-            "type": [
-                "null",
-                "string"
-            ],
-            "format": "date"
-        },
-        "event": {
-            "type": [
-                "null",
-                "string"
-            ]
         },
         "app_name": {
             "type": [
@@ -85,25 +72,25 @@
                 "string"
             ]
         },
-        "subscription_offer_type": {
+        "customer_price": {
             "type": [
                 "null",
                 "string"
             ]
         },
-        "subscription_offer_duration": {
+        "customer_currency": {
             "type": [
                 "null",
                 "string"
             ]
         },
-        "marketing_opt_in": {
+        "developer_proceeds": {
             "type": [
                 "null",
                 "string"
             ]
         },
-        "marketing_opt_in_duration": {
+        "proceeds_currency": {
             "type": [
                 "null",
                 "string"
@@ -120,19 +107,6 @@
                 "null",
                 "string"
             ]
-        },
-        "consecutive_paid_periods": {
-            "type": [
-                "null",
-                "integer"
-            ]
-        },
-        "original_start_date": {
-            "type": [
-                "null",
-                "string"
-            ],
-            "format": "date"
         },
         "client": {
             "type": [
@@ -158,42 +132,65 @@
                 "string"
             ]
         },
-        "previous_subscription_name": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "previous_subscription_apple_id": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "days_before_canceling": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "cancellation_reason": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "days_canceled": {
+        "active_standard_price_subscriptions": {
             "type": [
                 "null",
                 "integer"
             ]
         },
-        "quantity": {
+        "active_free_trial_introductory_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "active_pay_up_front_introductory_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "active_pay_as_you_go_introductory_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "free_trial_promotional_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "pay_up_front_promotional_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "pay_as_you_go_promotional_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "marketing_opt_ins": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "billing_retry": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "grace_period": {
             "type": [
                 "null",
                 "integer"
             ]
         }
     }
-  }
-  
+}
