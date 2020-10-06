@@ -1,0 +1,199 @@
+{
+    "type": [
+      "null",
+      "object"
+    ],
+    "properties": {
+        "_line_id": {
+            "type": [
+            "null",
+            "integer"
+            ]
+        },
+        "_time_extracted": {
+            "type": [
+            "null",
+            "string"
+            ],
+            "format" : "date-time"
+        },
+        "_api_report_date": {
+            "type": [
+            "null",
+            "string"
+            ],
+            "format" : "date"
+        },
+        "event_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date"
+        },
+        "event": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "app_name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "app_apple_id": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_apple_id": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_group_id": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "standard_subscription_duration": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "promotional_offer_name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "promotional_offer_id": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_offer_type": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_offer_duration": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "marketing_opt_in": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "marketing_opt_in_duration": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "preserved_pricing": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "proceeds_reason": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "consecutive_paid_periods": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "original_start_date": {
+            "type": [
+                "null",
+                "string"
+            ],
+            "format": "date"
+        },
+        "client": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "device": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "state": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "country": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "previous_subscription_name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "previous_subscription_apple_id": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "days_before_canceling": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "cancellation_reason": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "days_canceled": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "quantity": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        }
+    }
+  }
+  
