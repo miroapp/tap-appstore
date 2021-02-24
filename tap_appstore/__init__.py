@@ -162,7 +162,7 @@ def get_api_request_fields(report_date, stream_name) -> Dict[str, any]:
 
     api_fields = API_REQUEST_FIELDS.get(stream_name)
     if api_fields is None:
-        raise Exception('API request fields not set to stream "{}" '.format(stream_name))
+        raise Exception(f'API request fields not set to stream "{stream_name}"')
     else:
         report_filters.update(API_REQUEST_FIELDS[stream_name])
 
@@ -191,7 +191,7 @@ def _attempt_download_report(api: Api, report_filters: Dict[str, any]) -> Union[
 
     # parse api response
     if isinstance(rep_tsv, dict):
-        LOGGER.warning("Received a JSON response instead of the report: %s", str(rep_tsv))
+        LOGGER.warning(f"Received a JSON response instead of the report: {rep_tsv}")
     else:
         return tsv_to_list(rep_tsv)
 
