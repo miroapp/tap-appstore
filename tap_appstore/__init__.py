@@ -138,9 +138,7 @@ def discover(api: Api):
 
 def tsv_to_list(tsv):
     lines = tsv.split('\n')
-    header = [s.lower().replace(' ', '_').replace('-', '_') \
-              for s in lines[0].split('\t')]
-
+    header = [s.lower().replace(' ', '_').replace('-', '_') for s in lines[0].split('\t')]
     data = []
     for line in lines[1:]:
         if len(line) == 0:
