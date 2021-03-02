@@ -218,11 +218,11 @@ def query_report(api: Api, catalog_entry):
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
             # setting report filters for each stream
             report_filters = get_api_request_fields(report_date, stream_name)
-            rep = _attempt_download_report(api, report_filters)
+            report_optional = _attempt_download_report(api, report_filters)
 
-            if rep:
+            if report_optional:
                 # write records
-                for index, line in enumerate(rep, start=1):
+                for index, line in enumerate(report_optional, start=1):
                     data = line
                     data['_line_id'] = index
                     data['_time_extracted'] = extraction_time.strftime(TIME_EXTRACTED_FORMAT)
