@@ -204,47 +204,49 @@ def query_report(api: Api, catalog_entry):
     bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
     delta = timedelta(days=1)
     extraction_time = singer.utils.now().astimezone()
-    iterator = bookmark
+    current_date_iterator = bookmark
     singer.write_bookmark(
         Context.state,
         stream_name,
         'start_date',
-        iterator.strftime(BOOKMARK_DATE_FORMAT)
+        current_date_iterator.strftime(BOOKMARK_DATE_FORMAT)
     )
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
-        while iterator + delta <= extraction_time:
-            report_date = iterator.strftime("%Y-%m-%d")
+        while current_date_iterator + delta < extraction_time:
+            report_date = current_date_iterator.strftime("%Y-%m-%d")
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
             # setting report filters for each stream
             report_filters = get_api_request_fields(report_date, stream_name)
-            rep = _attempt_download_report(api, report_filters)
+            report_optional = _attempt_download_report(api, report_filters)
 
-            # write records
-            for index, line in enumerate(rep, start=1):
-                data = line
-                data['_line_id'] = index
-                data['_time_extracted'] = extraction_time.strftime(TIME_EXTRACTED_FORMAT)
-                data['_api_report_date'] = report_date
-                rec = transformer.transform(data, stream_schema)
+            if report_optional:
+                # write records
+                for index, line in enumerate(report_optional, start=1):
+                    data = line
+                    data['_line_id'] = index
+                    data['_time_extracted'] = extraction_time.strftime(TIME_EXTRACTED_FORMAT)
+                    data['_api_report_date'] = report_date
+                    rec = transformer.transform(data, stream_schema)
 
-                singer.write_record(
+                    singer.write_record(
+                        stream_name,
+                        rec,
+                        time_extracted=extraction_time
+                    )
+
+                    Context.new_counts[stream_name] += 1
+
+                singer.write_bookmark(
+                    Context.state,
                     stream_name,
-                    rec,
-                    time_extracted=extraction_time
+                    'start_date',
+                    (current_date_iterator + delta).strftime(BOOKMARK_DATE_FORMAT)
                 )
 
-                Context.new_counts[stream_name] += 1
+                singer.write_state(Context.state)
 
-            singer.write_bookmark(
-                Context.state,
-                stream_name,
-                'start_date',
-                (iterator + delta).strftime(BOOKMARK_DATE_FORMAT)
-            )
-
-            singer.write_state(Context.state)
-            iterator += delta
+            current_date_iterator += delta
 
     singer.write_state(Context.state)
 
