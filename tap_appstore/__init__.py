@@ -3,6 +3,7 @@
 from datetime import datetime
 from datetime import timedelta
 import os
+import tempfile
 import json
 from typing import Dict, Union, List
 
@@ -15,7 +16,6 @@ import pytz
 
 REQUIRED_CONFIG_KEYS = [
     'key_id',
-    'key_file',
     'issuer_id',
     'vendor',
     'start_date'
@@ -118,15 +118,21 @@ def discover(api: Api):
     for schema_name, schema in raw_schemas.items():
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
         filters = get_api_request_fields(report_date, schema_name)
+        mdata = metadata.new()
 
         report = _attempt_download_report(api, filters)
         if report:
+            # create metadata
+            for field in schema["properties"]:
+                mdata = metadata.write(mdata, ('properties', field), 'inclusion', 'available')
+            
             # create and add catalog entry
             catalog_entry = {
                 'stream': schema_name,
                 'tap_stream_id': schema_name,
                 'schema': schema,
-                'key_properties': []
+                'key_properties': [],
+                'metadata': metadata.to_list(mdata)
             }
             streams.append(catalog_entry)
 
@@ -220,6 +226,10 @@ def query_report(api: Api, catalog_entry):
             report_filters = get_api_request_fields(report_date, stream_name)
             rep = _attempt_download_report(api, report_filters)
 
+            if rep is None:
+                iterator += delta
+                continue
+
             # write records
             for index, line in enumerate(rep, start=1):
                 data = line
@@ -260,8 +270,13 @@ def get_bookmark(name):
 def main():
     # Parse command line arguments
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
-
     Context.config = args.config
+
+    if Context.config.get('private_key'):
+        with tempfile.NamedTemporaryFile("w", delete=False) as fp:
+            fp.write(Context.config['private_key'])
+            Context.config['key_file'] = fp.name
+    
     api = Api(
         Context.config['key_id'],
         Context.config['key_file'],
