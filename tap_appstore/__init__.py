@@ -116,7 +116,7 @@ def discover(api: Api):
     raw_schemas = load_schemas()
     streams = []
     for schema_name, schema in raw_schemas.items():
-        LOGGER.INFO("Discovering schema for %s", schema_name)
+        LOGGER.info("Discovering schema for %s", schema_name)
 
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
         filters = get_api_request_fields(report_date, schema_name)
