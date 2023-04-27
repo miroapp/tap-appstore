@@ -4,30 +4,6 @@
         "object"
     ],
     "properties": {
-        "_filename": {
-            "type": [
-                "null",
-                "string"
-            ]
-        },
-        "_index": {
-            "type": [
-                "null",
-                "integer"
-            ]
-        },
-        "account_number": {
-            "type": [
-                "null",
-                "integer"
-            ]
-        },
-        "vendor_number": {
-            "type": [
-                "null",
-                "integer"
-            ]
-        },
         "_line_id": {
             "type": [
                 "null",
