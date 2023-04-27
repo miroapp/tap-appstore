@@ -51,19 +51,19 @@ API_REQUEST_FIELDS = {
         'reportSubType': 'SUMMARY',
         'version': '1_0'
     },
-    'subscription_offer_code_redemption': {
+    'subscription_offer_code_redemption_report': {
         'reportType': 'SUBSCRIPTION_OFFER_CODE_REDEMPTION',
         'frequency': 'DAILY',
         'reportSubType': 'SUMMARY',
         'version': '1_0'
     },
-    'news_stand': {
+    'newsstand_report': {
         'reportType': 'NEWSSTAND',
         'frequency': 'DAILY',
         'reportSubType': 'DETAILED',
         'version': '1_0'
     },
-    'pre_order': {
+    'pre_order_report': {
         'reportType': 'PRE_ORDER',
         'frequency': 'DAILY',
         'reportSubType': 'SUMMARY',
