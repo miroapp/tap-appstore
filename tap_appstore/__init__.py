@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import logging
 from datetime import datetime
 from datetime import timedelta
 import os
@@ -11,7 +10,6 @@ from singer import utils, metadata, Transformer
 
 from appstoreconnect import Api
 from appstoreconnect.api import APIError
-import pytz
 
 REQUIRED_CONFIG_KEYS = [
     'key_id',
@@ -275,7 +273,6 @@ def main():
         catalog = discover(api)
         Context.config = args.config
         print(json.dumps(catalog, indent=2))
-
     else:
         Context.tap_start = utils.now()
         if args.catalog:
