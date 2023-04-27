@@ -184,8 +184,6 @@ def get_api_request_fields(report_date, stream_name) -> Dict[str, any]:
     else:
         report_filters.update(API_REQUEST_FIELDS[stream_name])
 
-    LOGGER.info('API report filters: %s', report_filters)
-
     return report_filters
 
 
