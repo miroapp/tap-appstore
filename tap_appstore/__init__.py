@@ -31,22 +31,40 @@ API_REQUEST_FIELDS = {
         'reportType': 'SUBSCRIPTION_EVENT',
         'frequency': 'DAILY',
         'reportSubType': 'SUMMARY',
-        'version': '1_2'
+        'version': '1_3'
     },
     'subscriber_report': {
         'reportType': 'SUBSCRIBER',
         'frequency': 'DAILY',
         'reportSubType': 'DETAILED',
-        'version': '1_2'
+        'version': '1_3'
     },
     'subscription_report': {
         'reportType': 'SUBSCRIPTION',
         'frequency': 'DAILY',
         'reportSubType': 'SUMMARY',
-        'version': '1_2'
+        'version': '1_3'
     },
     'sales_report': {
         'reportType': 'SALES',
+        'frequency': 'DAILY',
+        'reportSubType': 'SUMMARY',
+        'version': '1_0'
+    },
+    'subscription_offer_code_redemption': {
+        'reportType': 'SUBSCRIPTION_OFFER_CODE_REDEMPTION',
+        'frequency': 'DAILY',
+        'reportSubType': 'SUMMARY',
+        'version': '1_0'
+    },
+    'news_stand': {
+        'reportType': 'NEWSSTAND',
+        'frequency': 'DAILY',
+        'reportSubType': 'DETAILED',
+        'version': '1_0'
+    },
+    'pre_order': {
+        'reportType': 'PRE_ORDER',
         'frequency': 'DAILY',
         'reportSubType': 'SUMMARY',
         'version': '1_0'
