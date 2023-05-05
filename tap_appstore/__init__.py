@@ -87,8 +87,6 @@ class Context:
     catalog: Catalog = None
     tap_start = None
     stream_map = {}
-    new_counts = {}
-    updated_counts = {}
 
     @classmethod
     def get_catalog_entry(cls, stream_name):
@@ -113,16 +111,6 @@ class Context:
 
         return selected_streams
 
-    @classmethod
-    def print_counts(cls):
-        LOGGER.info('------------------')
-        for stream_name, stream_count in Context.new_counts.items():
-            LOGGER.info('%s: %d new, %d updates',
-                        stream_name,
-                        stream_count,
-                        Context.updated_counts[stream_name])
-        LOGGER.info('------------------')
-
 
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -144,8 +132,8 @@ def load_schemas():
         mdata = metadata.get_standard_metadata(schema=schema)
         mdata = metadata.to_map(mdata)
 
-        for field_name in schema['properties'].keys():
-            mdata = metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
+        # for field_name in schema['properties'].keys():
+        #     mdata = metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
 
         mdata = metadata.to_list(mdata)
         field_metadata[stream_name] = mdata
@@ -245,8 +233,6 @@ def sync(api: Api):
     # Write all schemas and init count to 0
     for stream_name, catalog_entry in Context.get_selected_streams():
         singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
-        Context.new_counts[stream_name] = 0
-        Context.updated_counts[stream_name] = 0
         query_report(api, catalog_entry)
 
 
@@ -297,19 +283,15 @@ def query_report(api: Api, catalog_entry: Dict):
 
             # write records
             for index, line in enumerate(rep, start=1):
-                data = line
-                data['_line_id'] = index
-                data['_time_extracted'] = extraction_time.strftime(TIME_EXTRACTED_FORMAT)
-                data['_api_report_date'] = report_date
+                data = {
+                    '_line_id': index,
+                    '_time_extracted': extraction_time.strftime(TIME_EXTRACTED_FORMAT),
+                    '_api_report_date': report_date,
+                    **line
+                }
                 rec = transformer.transform(data, stream_schema)
 
-                singer.write_record(
-                    stream_name,
-                    rec,
-                    time_extracted=extraction_time
-                )
-
-                Context.new_counts[stream_name] += 1
+                singer.write_record(stream_name, rec, time_extracted=extraction_time)
 
             singer.write_bookmark(
                 Context.state,
@@ -340,8 +322,6 @@ def main():
         Context.config['key_file'],
         Context.config['issuer_id']
     )
-
-    LOGGER.info("catalog: %s", args)
 
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
