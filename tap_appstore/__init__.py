@@ -164,7 +164,7 @@ def get_report_type(schema_name):
 
 def discover_catalog(api: Api):
     schemas, field_metadata = load_schemas()
-    streams = []
+    catalog = Catalog([])
     for schema_name, schema_dict in schemas.items():
         LOGGER.info("Discovering schema for %s", schema_name)
 
@@ -194,17 +194,17 @@ def discover_catalog(api: Api):
                 key_properties= mdata[0]['metadata'].get('table-key-properties'),
                 metadata=mdata
             )
-            streams.append(catalog_entry)
+            catalog.streams.append(catalog_entry)
 
-    if len(streams) == 0:
+    if len(catalog.streams) == 0:
         LOGGER.warning("Could not find any reports types to download for the input configuration.")
 
-    return Catalog(streams)
+    return catalog.to_dict()
 
 
 def do_discover(api: Api):
     LOGGER.info("Running discover")
-    catalog = {"streams": discover_catalog(api).dump()}
+    catalog = discover_catalog(api)
     LOGGER.info("Completed discover")
     return catalog
 
@@ -347,7 +347,7 @@ def main():
     if args.discover:
         catalog = do_discover(api)
         Context.config = args.config
-        pprint(catalog)
+        print(json.dumps(catalog, indent=2))
     else:
         Context.tap_start = utils.now()
         Context.catalog = args.catalog if args.catalog else do_discover(api)
