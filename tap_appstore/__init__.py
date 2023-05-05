@@ -322,7 +322,7 @@ def main():
     )
 
     # If discover flag was passed, run discovery mode and dump output to stdout
-    if args.do_discover:
+    if args.discover:
         catalog = do_discover(api)
         Context.config = args.config
         pprint(catalog)
