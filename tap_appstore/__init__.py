@@ -153,8 +153,7 @@ def discover(api: Api):
 
         if report_type := get_report_type(schema_name):
             report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime(
-                "%Y-%m-%d" if ReportType.SALES else "%Y-%m")
-            LOGGER.info("Report date: %s", report_date)
+                "%Y-%m-%d" if report_type == ReportType.SALES else "%Y-%m")
             filters = get_api_request_fields(report_date, schema_name, report_type)
             report = _attempt_download_report(api, filters, report_type)
         else:
@@ -256,7 +255,7 @@ def query_report(api: Api, catalog_entry):
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
         while iterator + delta <= extraction_time:
-            report_date = iterator.strftime("%Y-%m-%d")
+            report_date = iterator.strftime("%Y-%m" if stream_name == FINANCIAL_REPORT else "%Y-%m-%d")
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
             # setting report filters for each stream
             if report_type := get_report_type(stream_name):
