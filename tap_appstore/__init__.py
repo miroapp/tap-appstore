@@ -7,7 +7,7 @@ from typing import Dict, Union, List
 
 import singer
 from dateutil.relativedelta import relativedelta
-from singer import utils, metadata, Transformer
+from singer import utils, metadata, Transformer, Catalog
 
 from appstoreconnect import Api
 from appstoreconnect.api import APIError
@@ -83,7 +83,7 @@ class ReportType(Enum):
 class Context:
     config = {}
     state = {}
-    catalog = None
+    catalog: Catalog = None
     tap_start = None
     stream_map = {}
     new_counts = {}
