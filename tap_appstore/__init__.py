@@ -107,7 +107,7 @@ class Context:
         if stream is not None:
             stream_metadata = metadata.to_map(stream['metadata'])
             LOGGER.info("Stream %s selected: %s", stream_name, stream_metadata)
-            return metadata.get(stream_metadata, (), 'selected')
+            return stream_metadata.get((), {}).get('selected', False)
         return False
 
     @classmethod
@@ -322,6 +322,7 @@ def main():
         print(json.dumps(catalog, indent=2))
     else:
         Context.tap_start = utils.now()
+        LOGGER.info("args: %s", args)
         if args.catalog:
             Context.catalog = args.catalog.to_dict()
         else:
