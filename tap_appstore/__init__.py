@@ -191,7 +191,7 @@ def discover_catalog(api: Api):
                 stream=schema_name,
                 tap_stream_id=schema_name,
                 schema=schema,
-                key_properties= mdata[0]['metadata'].get('table-key-properties'),
+                key_properties=[],
                 metadata=mdata
             )
             catalog.streams.append(catalog_entry)
