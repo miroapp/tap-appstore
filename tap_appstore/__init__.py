@@ -131,14 +131,26 @@ def get_abs_path(path):
 # Load schemas from schemas folder
 def load_schemas():
     schemas = {}
+    field_metadata = {}
 
     for filename in os.listdir(get_abs_path('schemas')):
-        path = get_abs_path('schemas') + '/' + filename
-        file_raw = filename.replace('.json', '')
+        path = os.path.join(get_abs_path('schemas'), filename)
+        stream_name = filename.replace('.json', '')
         with open(path) as file:
-            schemas[file_raw] = Schema.from_dict(json.load(file))
+            schema = json.load(file)
 
-    return schemas
+        schemas[stream_name] = schema
+
+        mdata = metadata.get_standard_metadata(schema=schema)
+        mdata = metadata.to_map(mdata)
+
+        for field_name in schema['properties'].keys():
+            mdata = metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
+
+        mdata = metadata.to_list(mdata)
+        field_metadata[stream_name] = mdata
+
+    return schemas, field_metadata
 
 
 def get_report_type(schema_name):
@@ -151,10 +163,19 @@ def get_report_type(schema_name):
 
 
 def discover_catalog(api: Api):
-    raw_schemas = load_schemas()
+    schemas, field_metadata = load_schemas()
     streams = []
-    for schema_name, schema in raw_schemas.items():
+    for schema_name, schema_dict in schemas.items():
         LOGGER.info("Discovering schema for %s", schema_name)
+
+        try:
+            schema = Schema.from_dict(schema_dict)
+            mdata = field_metadata[schema_name]
+        except Exception as err:
+            LOGGER.error(err)
+            LOGGER.error('schema_name: %s', schema_name)
+            LOGGER.error('type schema_dict: %s', type(schema_dict))
+            raise err
 
         if report_type := get_report_type(schema_name):
             report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime(
@@ -170,7 +191,8 @@ def discover_catalog(api: Api):
                 stream=schema_name,
                 tap_stream_id=schema_name,
                 schema=schema,
-                key_properties=[]
+                key_properties= mdata[0]['metadata'].get('table-key-properties'),
+                metadata=mdata
             )
             streams.append(catalog_entry)
 
