@@ -150,7 +150,7 @@ def get_report_type(schema_name):
         return None
 
 
-def discover(api: Api):
+def discover_catalog(api: Api):
     raw_schemas = load_schemas()
     streams = []
     for schema_name, schema in raw_schemas.items():
@@ -177,7 +177,14 @@ def discover(api: Api):
     if len(streams) == 0:
         LOGGER.warning("Could not find any reports types to download for the input configuration.")
 
-    return {'streams': streams}
+    return Catalog(streams)
+
+
+def do_discover(api: Api):
+    LOGGER.info("Running discover")
+    catalog = {"streams": discover_catalog(api).dump()}
+    LOGGER.info("Completed discover")
+    return catalog
 
 
 def tsv_to_list(tsv):
@@ -315,13 +322,13 @@ def main():
     )
 
     # If discover flag was passed, run discovery mode and dump output to stdout
-    if args.discover:
-        catalog = discover(api)
+    if args.do_discover:
+        catalog = do_discover(api)
         Context.config = args.config
         pprint(catalog)
     else:
         Context.tap_start = utils.now()
-        Context.catalog = args.catalog if args.catalog else discover(api)
+        Context.catalog = args.catalog if args.catalog else do_discover(api)
         Context.state = args.state
         sync(api)
 
