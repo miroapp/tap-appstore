@@ -108,7 +108,7 @@ class Context:
             stream_metadata = stream.metadata
             for entry in stream_metadata:
                 # Stream metadata will have an empty breadcrumb
-                if not entry.breadcrumb and entry.metadata.get('selected', None):
+                if not entry['breadcrumb'] and entry['metadata'].get('selected', None):
                     selected_streams.append((stream.tap_stream_id, stream.to_dict()))
 
         return selected_streams
