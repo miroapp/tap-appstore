@@ -101,14 +101,13 @@ class Context:
         return stream["schema"]
 
     @classmethod
-    def is_selected(cls, stream_name):
-        stream = cls.get_catalog_entry(stream_name)
-        LOGGER.info("Stream %s selected: %s", stream_name, stream)
-        if stream is not None:
-            stream_metadata = metadata.to_map(stream['metadata'])
-            LOGGER.info("Stream %s selected: %s", stream_name, stream_metadata)
-            return stream_metadata.get((), {}).get('selected', False)
-        return False
+    def get_selected_streams(cls):
+        selected_stream_names = []
+        for catalog_entry in cls.catalog['streams']:
+            mdata = metadata.to_map(catalog_entry.metadata)
+            if mdata.get((), {}).get('selected', False):
+                selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
+        return selected_stream_names
 
     @classmethod
     def print_counts(cls):
@@ -211,15 +210,11 @@ def get_api_request_fields(report_date, stream_name, report_type: ReportType) ->
 
 def sync(api: Api):
     # Write all schemas and init count to 0
-    for catalog_entry in Context.catalog['streams']:
-        stream_name = catalog_entry["tap_stream_id"]
-        if Context.is_selected(stream_name):
-            singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
-
-            Context.new_counts[stream_name] = 0
-            Context.updated_counts[stream_name] = 0
-
-            query_report(api, catalog_entry)
+    for stream_name, catalog_entry in Context.get_selected_streams():
+        singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
+        Context.new_counts[stream_name] = 0
+        Context.updated_counts[stream_name] = 0
+        query_report(api, catalog_entry)
 
 
 def _attempt_download_report(api: Api, report_filters: Dict[str, any], report_type: ReportType) -> Union[List[Dict], None]:
@@ -322,7 +317,6 @@ def main():
         print(json.dumps(catalog, indent=2))
     else:
         Context.tap_start = utils.now()
-        LOGGER.info("args: %s", args)
         if args.catalog:
             Context.catalog = args.catalog.to_dict()
         else:
