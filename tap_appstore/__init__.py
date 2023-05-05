@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import json
 from enum import Enum
+from pprint import pprint
 from typing import Dict, Union, List
 
 import singer
@@ -317,7 +318,7 @@ def main():
     if args.discover:
         catalog = discover(api)
         Context.config = args.config
-        print(json.dumps(catalog, indent=2))
+        pprint(catalog)
     else:
         Context.tap_start = utils.now()
         Context.catalog = args.catalog if args.catalog else discover(api)
