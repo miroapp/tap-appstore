@@ -211,12 +211,13 @@ def sync(api: Api):
     # Write all schemas and init count to 0
     for catalog_entry in Context.catalog['streams']:
         stream_name = catalog_entry["tap_stream_id"]
-        singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
+        if Context.is_selected(stream_name):
+            singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
 
-        Context.new_counts[stream_name] = 0
-        Context.updated_counts[stream_name] = 0
+            Context.new_counts[stream_name] = 0
+            Context.updated_counts[stream_name] = 0
 
-        query_report(api, catalog_entry)
+            query_report(api, catalog_entry)
 
 
 def _attempt_download_report(api: Api, report_filters: Dict[str, any], report_type: ReportType) -> Union[List[Dict], None]:
