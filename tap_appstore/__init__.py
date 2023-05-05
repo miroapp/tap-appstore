@@ -74,6 +74,7 @@ SALES_API_REQUEST_FIELDS = {
 
 FINANCIAL_REPORT = 'financial_report'
 
+
 class ReportType(Enum):
     SALES = 1
     FINANCE = 2
