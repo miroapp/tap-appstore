@@ -128,15 +128,7 @@ def load_schemas():
             schema = json.load(file)
 
         schemas[stream_name] = schema
-
-        mdata = metadata.get_standard_metadata(schema=schema)
-        mdata = metadata.to_map(mdata)
-
-        # for field_name in schema['properties'].keys():
-        #     mdata = metadata.write(mdata, ('properties', field_name), 'inclusion', 'automatic')
-
-        mdata = metadata.to_list(mdata)
-        field_metadata[stream_name] = mdata
+        field_metadata[stream_name] = metadata.get_standard_metadata(schema=schema)
 
     return schemas, field_metadata
 
