@@ -83,7 +83,7 @@ class ReportType(Enum):
 class Context:
     config = {}
     state = {}
-    catalog = {}
+    catalog = None
     tap_start = None
     stream_map = {}
     new_counts = {}
@@ -92,18 +92,18 @@ class Context:
     @classmethod
     def get_catalog_entry(cls, stream_name):
         if not cls.stream_map:
-            cls.stream_map = {s["tap_stream_id"]: s for s in cls.catalog['streams']}
+            cls.stream_map = {s.tap_stream_id: s for s in cls.catalog.streams}
         return cls.stream_map.get(stream_name)
 
     @classmethod
     def get_schema(cls, stream_name):
-        stream = [s for s in cls.catalog["streams"] if s["tap_stream_id"] == stream_name][0]
-        return stream["schema"]
+        stream = [s for s in cls.catalog.streams if s.tap_stream_id == stream_name][0]
+        return stream.schema
 
     @classmethod
     def get_selected_streams(cls):
         selected_stream_names = []
-        for catalog_entry in cls.catalog['streams']:
+        for catalog_entry in cls.catalog.streams:
             mdata = metadata.to_map(catalog_entry.metadata)
             if mdata.get((), {}).get('selected', False):
                 selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
@@ -211,7 +211,7 @@ def get_api_request_fields(report_date, stream_name, report_type: ReportType) ->
 def sync(api: Api):
     # Write all schemas and init count to 0
     for stream_name, catalog_entry in Context.get_selected_streams():
-        singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
+        singer.write_schema(stream_name, catalog_entry.schema, catalog_entry.key_properties)
         Context.new_counts[stream_name] = 0
         Context.updated_counts[stream_name] = 0
         query_report(api, catalog_entry)
@@ -233,8 +233,8 @@ def _attempt_download_report(api: Api, report_filters: Dict[str, any], report_ty
         return tsv_to_list(rep_tsv)
 
 def query_report(api: Api, catalog_entry):
-    stream_name = catalog_entry["tap_stream_id"]
-    stream_schema = catalog_entry['schema']
+    stream_name = catalog_entry.tap_stream_id
+    stream_schema = catalog_entry.schema
 
     # get bookmark from when data will be pulled
     bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
@@ -317,10 +317,7 @@ def main():
         print(json.dumps(catalog, indent=2))
     else:
         Context.tap_start = utils.now()
-        if args.catalog:
-            Context.catalog = args.catalog.to_dict()
-        else:
-            Context.catalog = discover(api)
+        Context.catalog = args.catalog if args.catalog else discover(api)
 
         Context.state = args.state
         sync(api)
