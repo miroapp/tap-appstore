@@ -110,7 +110,7 @@
                 "number"
             ]
         },
-        "Level 1customer_currency": {
+        "customer_currency": {
             "type": [
                 "null",
                 "string"
