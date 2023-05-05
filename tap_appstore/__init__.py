@@ -106,7 +106,7 @@ class Context:
         LOGGER.info("Stream %s selected: %s", stream_name, stream.get('selected'))
         if stream is not None:
             stream_metadata = metadata.to_map(stream['metadata'])
-            LOGGER.info("Stream %s selected: %s", stream_name, stream_metadata.get(stream_metadata, (), 'selected'))
+            LOGGER.info("Stream %s selected: %s", stream_name, stream_metadata)
             return metadata.get(stream_metadata, (), 'selected')
         return False
 
