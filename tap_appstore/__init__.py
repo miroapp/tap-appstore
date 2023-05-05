@@ -243,7 +243,7 @@ def query_report(api: Api, catalog_entry):
     delta = relativedelta(days=1)
     if stream_name == FINANCIAL_REPORT:
         bookmark = bookmark.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        delta = relativedelta(month=1)
+        delta = relativedelta(months=1)
     extraction_time = singer.utils.now().astimezone()
     iterator = bookmark
     singer.write_bookmark(
