@@ -304,9 +304,7 @@ def query_report(api: Api, catalog_entry):
 
 def get_bookmark(name):
     bookmark = singer.get_bookmark(Context.state, name, 'start_date')
-    if bookmark is None:
-        bookmark = Context.config['start_date']
-    return bookmark
+    return bookmark or Context.config['start_date']
 
 
 @utils.handle_top_exception(LOGGER)
@@ -321,7 +319,7 @@ def main():
         Context.config['issuer_id']
     )
 
-    LOGGER.info("catalog: %s", args.catalog)
+    LOGGER.info("catalog: %s", args)
 
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
