@@ -244,7 +244,7 @@ def get_api_request_fields(report_date, stream_name, report_type: ReportType) ->
 def sync(api: Api):
     # Write all schemas and init count to 0
     for stream_name, catalog_entry in Context.get_selected_streams():
-        singer.write_schema(stream_name, catalog_entry.schema, catalog_entry.key_properties)
+        singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
         Context.new_counts[stream_name] = 0
         Context.updated_counts[stream_name] = 0
         query_report(api, catalog_entry)
