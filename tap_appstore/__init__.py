@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 import os
 import json
+from enum import Enum
 from typing import Dict, Union, List
 
 import singer
@@ -26,7 +27,7 @@ LOGGER = singer.get_logger()
 BOOKMARK_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TIME_EXTRACTED_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
-API_REQUEST_FIELDS = {
+SALES_API_REQUEST_FIELDS = {
     'subscription_event_report': {
         'reportType': 'SUBSCRIPTION_EVENT',
         'frequency': 'DAILY',
@@ -70,6 +71,12 @@ API_REQUEST_FIELDS = {
         'version': '1_0'
     }
 }
+
+FINANCIAL_REPORT = 'financial_report'
+
+class ReportType(Enum):
+    SALES = 1
+    FINANCE = 2
 
 
 class Context:
@@ -127,6 +134,14 @@ def load_schemas():
 
     return schemas
 
+def get_report_type(schema_name):
+    if schema_name in SALES_API_REQUEST_FIELDS:
+        return ReportType.SALES
+    elif schema_name == FINANCIAL_REPORT:
+        return ReportType.FINANCE
+    else:
+        return None
+
 
 def discover(api: Api):
     raw_schemas = load_schemas()
@@ -135,9 +150,12 @@ def discover(api: Api):
         LOGGER.info("Discovering schema for %s", schema_name)
 
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
-        filters = get_api_request_fields(report_date, schema_name)
+        if report_type := get_report_type(schema_name):
+            filters = get_api_request_fields(report_date, schema_name, report_type)
+            report = _attempt_download_report(api, filters, report_type)
+        else:
+            raise Exception(f'Schema {schema_name} not found!')
 
-        report = _attempt_download_report(api, filters)
         if report:
             # create and add catalog entry
             catalog_entry = {
@@ -171,19 +189,18 @@ def tsv_to_list(tsv):
     return data
 
 
-def get_api_request_fields(report_date, stream_name) -> Dict[str, any]:
+def get_api_request_fields(report_date, stream_name, report_type: ReportType) -> Dict[str, any]:
     """Get fields to be used in appstore API request """
     report_filters = {
         'reportDate': report_date,
         'vendorNumber': f"{Context.config['vendor']}"
     }
-
-    api_fields = API_REQUEST_FIELDS.get(stream_name)
-    if api_fields is None:
-        raise Exception(f'API request fields not set to stream "{stream_name}"')
-    else:
-        report_filters.update(API_REQUEST_FIELDS[stream_name])
-
+    if report_type == ReportType.SALES:
+        api_fields = SALES_API_REQUEST_FIELDS.get(stream_name)
+        if api_fields is None:
+            raise Exception(f'API request fields not set to stream "{stream_name}"')
+        else:
+            report_filters.update(SALES_API_REQUEST_FIELDS[stream_name])
     return report_filters
 
 
@@ -199,10 +216,11 @@ def sync(api: Api):
         query_report(api, catalog_entry)
 
 
-def _attempt_download_report(api: Api, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+def _attempt_download_report(api: Api, report_filters: Dict[str, any], report_type: ReportType) -> Union[List[Dict], None]:
     # fetch data from appstore api
     try:
-        rep_tsv = api.download_sales_and_trends_reports(filters=report_filters)
+        rep_tsv = api.download_sales_and_trends_reports(filters=report_filters) if report_type == ReportType.SALES \
+            else api.download_finance_reports(filters=report_filters)
     except APIError as e:
         LOGGER.error(e)
         return None
@@ -212,7 +230,6 @@ def _attempt_download_report(api: Api, report_filters: Dict[str, any]) -> Union[
         LOGGER.warning(f"Received a JSON response instead of the report: {rep_tsv}")
     else:
         return tsv_to_list(rep_tsv)
-
 
 def query_report(api: Api, catalog_entry):
     stream_name = catalog_entry["tap_stream_id"]
@@ -235,8 +252,11 @@ def query_report(api: Api, catalog_entry):
             report_date = iterator.strftime("%Y-%m-%d")
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
             # setting report filters for each stream
-            report_filters = get_api_request_fields(report_date, stream_name)
-            rep = _attempt_download_report(api, report_filters)
+            if report_type := get_report_type(stream_name):
+                report_filters = get_api_request_fields(report_date, stream_name, report_type)
+                rep = _attempt_download_report(api, report_filters, report_type)
+            else:
+                raise Exception(f'Stream {stream_name} not found!')
 
             # write records
             for index, line in enumerate(rep, start=1):
