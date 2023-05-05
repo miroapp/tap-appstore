@@ -265,9 +265,9 @@ def _attempt_download_report(api: Api, report_filters: Dict[str, any], report_ty
     else:
         return tsv_to_list(rep_tsv)
 
-def query_report(api: Api, catalog_entry):
-    stream_name = catalog_entry.tap_stream_id
-    stream_schema = catalog_entry.schema
+def query_report(api: Api, catalog_entry: Dict):
+    stream_name = catalog_entry['tap_stream_id']
+    stream_schema = catalog_entry['schema']
 
     # get bookmark from when data will be pulled
     bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
