@@ -321,6 +321,8 @@ def main():
         Context.config['issuer_id']
     )
 
+    LOGGER.info("catalog: %s", args.catalog)
+
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
         catalog = do_discover(api)
