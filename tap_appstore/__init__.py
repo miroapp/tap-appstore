@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 from datetime import datetime
-from datetime import timedelta
 import os
 import json
 from enum import Enum
 from typing import Dict, Union, List
 
 import singer
+from dateutil.relativedelta import relativedelta
 from singer import utils, metadata, Transformer
 
 from appstoreconnect import Api
@@ -135,6 +135,7 @@ def load_schemas():
 
     return schemas
 
+
 def get_report_type(schema_name):
     if schema_name in SALES_API_REQUEST_FIELDS:
         return ReportType.SALES
@@ -239,7 +240,10 @@ def query_report(api: Api, catalog_entry):
 
     # get bookmark from when data will be pulled
     bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
-    delta = timedelta(days=1)
+    delta = relativedelta(days=1)
+    if stream_name == FINANCIAL_REPORT:
+        bookmark = bookmark.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        delta = relativedelta(month=1)
     extraction_time = singer.utils.now().astimezone()
     iterator = bookmark
     singer.write_bookmark(

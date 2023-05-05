@@ -12,7 +12,8 @@ setup(name='tap-appstore',
       install_requires=[
           'singer-python==5.13.0',
           'appstoreconnect==0.10.0',
-          'pytz==2023.3'
+          'pytz==2023.3',
+          'python-dateutil>=2.8.2,<3.0.0'
       ],
       entry_points='''
           [console_scripts]
