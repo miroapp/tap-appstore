@@ -103,8 +103,10 @@ class Context:
     @classmethod
     def is_selected(cls, stream_name):
         stream = cls.get_catalog_entry(stream_name)
+        LOGGER.info("Stream %s selected: %s", stream_name, stream.get('selected'))
         if stream is not None:
             stream_metadata = metadata.to_map(stream['metadata'])
+            LOGGER.info("Stream %s selected: %s", stream_name, stream_metadata.get(stream_metadata, (), 'selected'))
             return metadata.get(stream_metadata, (), 'selected')
         return False
 
