@@ -7,7 +7,7 @@ from typing import Dict, Union, List
 
 import singer
 from dateutil.relativedelta import relativedelta
-from singer import utils, metadata, Transformer, Catalog
+from singer import utils, metadata, Transformer, Catalog, CatalogEntry, Schema
 
 from appstoreconnect import Api
 from appstoreconnect.api import APIError
@@ -104,11 +104,12 @@ class Context:
     def get_selected_streams(cls):
         selected_stream_names = []
         for catalog_entry in cls.catalog.streams:
-            mdata = metadata.to_map(catalog_entry.metadata)
-            LOGGER.info('Metadata for %s: %s', catalog_entry, catalog_entry.is_selected())
-            if mdata.get((), {}).get('selected', False):
-                LOGGER.info('Selected stream: %s', catalog_entry.tap_stream_id)
-                selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
+            # mdata = metadata.to_map(catalog_entry.metadata)
+            # LOGGER.info('Metadata for %s: %s', catalog_entry, catalog_entry.is_selected())
+            # if mdata.get((), {}).get('selected', False):
+            #     LOGGER.info('Selected stream: %s', catalog_entry.tap_stream_id)
+            #     selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
+            selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
         return selected_stream_names
 
     @classmethod
@@ -134,7 +135,7 @@ def load_schemas():
         path = get_abs_path('schemas') + '/' + filename
         file_raw = filename.replace('.json', '')
         with open(path) as file:
-            schemas[file_raw] = json.load(file)
+            schemas[file_raw] = Schema.from_dict(json.load(file))
 
     return schemas
 
@@ -164,12 +165,12 @@ def discover(api: Api):
 
         if report:
             # create and add catalog entry
-            catalog_entry = {
-                'stream': schema_name,
-                'tap_stream_id': schema_name,
-                'schema': schema,
-                'key_properties': []
-            }
+            catalog_entry = CatalogEntry(
+                stream=schema_name,
+                tap_stream_id=schema_name,
+                schema=schema,
+                key_properties=[]
+            )
             streams.append(catalog_entry)
 
     if len(streams) == 0:
