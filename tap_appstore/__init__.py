@@ -154,6 +154,7 @@ def discover(api: Api):
         if report_type := get_report_type(schema_name):
             report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime(
                 "%Y-%m-%d" if ReportType.SALES else "%Y-%m")
+            LOGGER.info("Report date: %s", report_date)
             filters = get_api_request_fields(report_date, schema_name, report_type)
             report = _attempt_download_report(api, filters, report_type)
         else:
