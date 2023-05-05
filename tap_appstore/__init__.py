@@ -105,7 +105,7 @@ class Context:
         selected_stream_names = []
         for catalog_entry in cls.catalog.streams:
             mdata = metadata.to_map(catalog_entry.metadata)
-            LOGGER.info('Metadata for %s: %s', catalog_entry.tap_stream_id, mdata)
+            LOGGER.info('Metadata for %s: %s', catalog_entry, dir(catalog_entry))
             if mdata.get((), {}).get('selected', False):
                 LOGGER.info('Selected stream: %s', catalog_entry.tap_stream_id)
                 selected_stream_names.append((catalog_entry.tap_stream_id, catalog_entry))
@@ -320,7 +320,6 @@ def main():
     else:
         Context.tap_start = utils.now()
         Context.catalog = args.catalog if args.catalog else discover(api)
-
         Context.state = args.state
         sync(api)
 
