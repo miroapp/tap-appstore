@@ -35,19 +35,21 @@ def discover(client: Api):
             raise err
 
         try:
-            STREAMS[schema_name](client, {}, {}).get_report()
+            # checking API credentials
+            assert client.list_users() > 0, 'API call failed'
         except APIError as e:
-            raise Exception(f'Report test failed for {schema_name}! \n{e}')
+            raise Exception(f'API Call failed {e}')
 
-        # create and add catalog entry
-        catalog_entry = CatalogEntry(
-            stream=schema_name,
-            tap_stream_id=schema_name,
-            schema=schema,
-            key_properties=[],
-            metadata=mdata
-        )
-        catalog.streams.append(catalog_entry)
+        if schema_name in STREAMS:
+            # create and add catalog entry
+            catalog_entry = CatalogEntry(
+                stream=schema_name,
+                tap_stream_id=schema_name,
+                schema=schema,
+                key_properties=[],
+                metadata=mdata
+            )
+            catalog.streams.append(catalog_entry)
 
     if len(catalog.streams) == 0:
         LOGGER.warning("Could not find any reports types to download for the input configuration.")
