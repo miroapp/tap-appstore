@@ -22,17 +22,8 @@ def discover(client: Api):
     """
     schemas, field_metadata = load_schemas()
     catalog = Catalog([])
-    for schema_name, schema_dict in schemas.items():
+    for schema_name, schema in schemas.items():
         LOGGER.info("Discovering schema for %s", schema_name)
-
-        try:
-            schema = Schema.from_dict(schema_dict)
-            mdata = field_metadata[schema_name]
-        except Exception as err:
-            LOGGER.error(err)
-            LOGGER.error('schema_name: %s', schema_name)
-            LOGGER.error('type schema_dict: %s', type(schema_dict))
-            raise err
 
         try:
             # checking API credentials
@@ -47,7 +38,7 @@ def discover(client: Api):
                 tap_stream_id=schema_name,
                 schema=schema,
                 key_properties=[],
-                metadata=mdata
+                metadata=field_metadata[schema_name]
             )
             catalog.streams.append(catalog_entry)
 
