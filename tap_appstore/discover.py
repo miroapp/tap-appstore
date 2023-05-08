@@ -9,14 +9,14 @@ from tap_appstore.streams import STREAMS
 LOGGER = singer.get_logger()
 
 
-def do_discover(client: Api):
+def do_discover(client: Api) -> Catalog:
     LOGGER.info("Running discover")
     catalog = discover(client)
     LOGGER.info("Completed discover")
     return catalog
 
 
-def discover(client: Api):
+def discover(client: Api) -> Catalog:
     """
     Run the discovery mode, prepare the catalog file and return catalog.
     """
