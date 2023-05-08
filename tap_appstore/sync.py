@@ -6,7 +6,7 @@ from tap_appstore.streams import STREAMS
 
 def get_selected_streams(catalog):
     selected_streams = []
-    for stream in catalog.streams:
+    for stream in catalog['streams']:
         stream_metadata = stream.metadata
         for entry in stream_metadata:
             # Stream metadata will have an empty breadcrumb

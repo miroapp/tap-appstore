@@ -144,7 +144,6 @@ class Stream:
                         '_line_id': index,
                         '_time_extracted': extraction_time.strftime(DATE_FORMAT),
                         '_api_report_date': iterator.strftime(self.report_date_format),
-
                         **line
                     }
                     rec = transformer.transform(data, stream_schema)
