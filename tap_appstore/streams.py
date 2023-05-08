@@ -79,7 +79,7 @@ class Stream:
 
     def get_bookmark(self):
         bookmark = singer.get_bookmark(self.state, self.name, 'start_date', self.config.get('start_date'))
-        return datetime.strptime(bookmark, DATE_FORMAT)
+        return bookmark.strptime(DATE_FORMAT)
 
     def update_bookmark(self, value: datetime):
         singer.write_bookmark(self.state, self.name, 'start_date', value.strftime(DATE_FORMAT))
@@ -106,11 +106,11 @@ class Stream:
         return self.config['vendor']
 
     @staticmethod
-    def parse_api_response(response):
-        if isinstance(response, dict):
-            raise Exception(f"Received a JSON response instead of the report: {response}")
+    def parse_api_response(response_tsv):
+        if isinstance(response_tsv, dict):
+            raise Exception(f"Received a JSON response instead of the report: {response_tsv}")
 
-        lines = response.split('\n')
+        lines = response_tsv.split('\n')
         header = [s.lower().replace(' ', '_').replace('-', '_') for s in lines[0].split('\t')]
         data = []
         for line in lines[1:]:
