@@ -19,6 +19,6 @@ def get_selected_streams(catalog):
 def sync(client: Api, config, state, catalog):
     # Write all schemas and init count to 0
     for stream_name, catalog_entry in get_selected_streams(catalog):
-        stream_obj = STREAMS[stream_name](client, config)
+        stream_obj = STREAMS[stream_name](client, config, state)
         singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
         stream_obj.query_report(catalog_entry)
