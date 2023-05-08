@@ -2,7 +2,7 @@
 import json
 import os
 
-from singer import metadata
+from singer import metadata, Schema
 
 
 def get_abs_path(path):
@@ -21,7 +21,7 @@ def load_schemas():
         stream_name = filename.replace('.json', '')
         with open(path) as file:
             schema = json.load(file)
-        schemas[stream_name] = schema
+        schemas[stream_name] = Schema.from_dict(schema)
         field_metadata[stream_name] = metadata.get_standard_metadata(schema=schema)
 
     return schemas, field_metadata
