@@ -3,7 +3,7 @@ from typing import Dict, Union, List, Tuple
 
 import singer
 from dateutil.relativedelta import relativedelta
-from singer import Transformer
+from singer import Transformer, CatalogEntry
 
 from appstoreconnect.api import APIError
 from appstoreconnect import Api
@@ -124,8 +124,8 @@ class Stream:
             data.append(line_obj)
         return data
 
-    def query_report(self, catalog_entry: Dict):
-        stream_schema = catalog_entry['schema']
+    def query_report(self, catalog_entry: CatalogEntry):
+        stream_schema = catalog_entry.schema
 
         # get bookmark from when data will be pulled
         iterator = self.get_bookmark().astimezone()
