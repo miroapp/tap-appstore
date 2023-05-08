@@ -35,7 +35,7 @@ def discover(client: Api):
             raise err
 
         try:
-            STREAMS[schema_name](client, {}).get_report()
+            STREAMS[schema_name](client, {}, {}).get_report()
         except APIError as e:
             raise Exception(f'Report test failed for {schema_name}! \n{e}')
 
