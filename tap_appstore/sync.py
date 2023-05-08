@@ -23,4 +23,4 @@ def sync(client: Api, config, state, catalog: Catalog):
         schema_dict = catalog_entry.schema.to_dict()
         stream_obj = STREAMS[stream_name](client, config, state)
         singer.write_schema(stream_name, schema_dict, catalog_entry.key_properties)
-        stream_obj.query_report(catalog_entry)
+        stream_obj.query_report(schema_dict)
