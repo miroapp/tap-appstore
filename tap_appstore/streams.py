@@ -97,9 +97,9 @@ class Stream:
         """
         pass
 
-    def get_report(self, report_date: datetime = None):
-        filters = self.get_api_request_fields(report_date or self.get_bookmark())
-        return self._attempt_download_report(filters), filters['reportDate']
+    def get_report(self, report_date: datetime):
+        filters = self.get_api_request_fields(report_date)
+        return self._attempt_download_report(filters)
 
     @property
     def vendor(self):
@@ -136,14 +136,15 @@ class Stream:
         with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
             while iterator + self.delta <= extraction_time:
                 # setting report filters for each stream
-                rep, report_date = self.get_report(iterator)
+                rep = self.get_report(iterator)
 
                 # write records
                 for index, line in enumerate(rep, start=1):
                     data = {
                         '_line_id': index,
                         '_time_extracted': extraction_time.strftime(DATE_FORMAT),
-                        '_api_report_date': report_date,
+                        '_api_report_date': iterator.strftime(self.report_date_format),
+
                         **line
                     }
                     rec = transformer.transform(data, stream_schema)
