@@ -124,9 +124,7 @@ class Stream:
             data.append(line_obj)
         return data
 
-    def query_report(self, catalog_entry: CatalogEntry):
-        stream_schema = catalog_entry.schema
-
+    def query_report(self, schema_dict: Dict):
         # get bookmark from when data will be pulled
         iterator = self.get_bookmark().astimezone()
 
@@ -146,7 +144,7 @@ class Stream:
                         '_api_report_date': iterator.strftime(self.report_date_format),
                         **line
                     }
-                    rec = transformer.transform(data, stream_schema)
+                    rec = transformer.transform(data, schema_dict)
 
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
 

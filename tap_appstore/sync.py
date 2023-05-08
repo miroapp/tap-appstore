@@ -20,6 +20,7 @@ def get_selected_streams(catalog: Catalog) -> List[CatalogEntry]:
 def sync(client: Api, config, state, catalog: Catalog):
     for catalog_entry in get_selected_streams(catalog):
         stream_name = catalog_entry.tap_stream_id
+        schema_dict = catalog_entry.schema.to_dict()
         stream_obj = STREAMS[stream_name](client, config, state)
-        singer.write_schema(stream_name, catalog_entry.schema.to_dict(), catalog_entry.key_properties)
+        singer.write_schema(stream_name, schema_dict, catalog_entry.key_properties)
         stream_obj.query_report(catalog_entry)
