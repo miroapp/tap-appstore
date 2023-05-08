@@ -64,18 +64,15 @@ class Stream:
     """
     A base class representing tap-appstore streams.
     """
-    name = None
-    replication_method = None
-    replication_key = None
     key_properties = KEY_PROPERTIES
-    stream = None
     delta = relativedelta(days=1)
     report_date_format = '%Y-%m-%d'
 
-    def __init__(self, client: Api, config: Dict[str, any], state):
+    def __init__(self, name, client: Api, config: Dict[str, any], state):
         self.api = client
         self.config = config
         self.state = state
+        self.name = name
 
     def get_bookmark(self):
         bookmark = singer.get_bookmark(self.state, self.name, 'start_date', self.config.get('start_date'))
