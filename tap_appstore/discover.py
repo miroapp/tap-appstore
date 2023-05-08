@@ -36,7 +36,7 @@ def discover(client: Api):
 
         try:
             # checking API credentials
-            assert client.list_users() > 0, 'API call failed'
+            assert len(client.list_users()) > 0, 'API call failed'
         except APIError as e:
             raise Exception(f'API Call failed {e}')
 
