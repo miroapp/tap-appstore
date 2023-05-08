@@ -54,4 +54,4 @@ def discover(client: Api):
     if len(catalog.streams) == 0:
         LOGGER.warning("Could not find any reports types to download for the input configuration.")
 
-    return catalog.to_dict()
+    return catalog

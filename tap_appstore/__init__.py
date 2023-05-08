@@ -34,7 +34,7 @@ def main():
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
         catalog = do_discover(client)
-        print(json.dumps(catalog, indent=2))
+        print(json.dumps(catalog.to_dict(), indent=2))
     else:
         catalog = args.catalog if args.catalog else do_discover(client)
         sync(client, config, state, catalog)
