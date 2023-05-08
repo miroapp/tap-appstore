@@ -79,7 +79,7 @@ class Stream:
 
     def get_bookmark(self):
         bookmark = singer.get_bookmark(self.state, self.name, 'start_date', self.config.get('start_date'))
-        return bookmark.strptime(DATE_FORMAT)
+        return datetime.strptime(bookmark, DATE_FORMAT)
 
     def update_bookmark(self, value: datetime):
         singer.write_bookmark(self.state, self.name, 'start_date', value.strftime(DATE_FORMAT))
