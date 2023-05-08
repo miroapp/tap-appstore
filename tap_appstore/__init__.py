@@ -27,13 +27,17 @@ def main():
     config = args.config
     client = Api(config['key_id'], config['key_file'], config['issuer_id'])
 
+    state = {}
+    if args.state:
+        state = args.state
+
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
         catalog = do_discover(client)
         print(json.dumps(catalog, indent=2))
     else:
         catalog = args.catalog if args.catalog else do_discover(client)
-        sync(catalog, client, config)
+        sync(client, config, state, catalog)
 
 
 if __name__ == '__main__':

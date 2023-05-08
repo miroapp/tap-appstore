@@ -72,9 +72,10 @@ class Stream:
     delta = relativedelta(days=1)
     report_date_format = '%Y-%m-%d'
 
-    def __init__(self, client: Api, config: Dict[str, any]):
+    def __init__(self, client: Api, config: Dict[str, any], state):
         self.api = client
         self.config = config
+        self.state = state
 
     def get_bookmark(self):
         bookmark = singer.get_bookmark(self.state, self.name, 'start_date', self.config['start_date'])
@@ -99,10 +100,6 @@ class Stream:
     def get_report(self, report_date: datetime = None):
         filters = self.get_api_request_fields(report_date or self.get_bookmark())
         return self._attempt_download_report(filters), filters['reportDate']
-
-    @property
-    def state(self):
-        return self.config['state']
 
     @property
     def vendor(self):

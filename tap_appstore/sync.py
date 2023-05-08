@@ -16,7 +16,7 @@ def get_selected_streams(catalog):
     return selected_streams
 
 
-def sync(catalog, client: Api, config):
+def sync(client: Api, config, state, catalog):
     # Write all schemas and init count to 0
     for stream_name, catalog_entry in get_selected_streams(catalog):
         stream_obj = STREAMS[stream_name](client, config)
