@@ -136,6 +136,8 @@ class Stream:
 
                 # write records
                 for index, line in enumerate(rep, start=1):
+                    if self.skip_line(line):
+                        continue
                     data = {
                         '_line_id': index,
                         '_time_extracted': extraction_time.strftime(DATE_FORMAT),
@@ -152,6 +154,12 @@ class Stream:
                 singer.write_state(self.state)
                 iterator += self.delta
         singer.write_state(self.state)
+
+    def skip_line(self, line: Dict) -> bool:
+        """
+        Returns True if the line should be skipped, False otherwise.
+        """
+        return False
 
 
 class SalesReportStream(Stream):
@@ -190,6 +198,9 @@ class FinancialReportStream(Stream):
 
     def get_bookmark(self):
         return super().get_bookmark().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    def skip_line(self, line: Dict) -> bool:
+        return 'apple_identifier' not in line
 
 
 # Dictionary of the stream classes
