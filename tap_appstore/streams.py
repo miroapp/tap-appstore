@@ -139,9 +139,9 @@ class Stream:
                         '_line_id': index,
                         '_time_extracted': extraction_time.strftime(DATE_FORMAT),
                         '_api_report_date': iterator.strftime(self.report_date_format),
+                        'vendor_number': self.vendor,
                         **line
                     }
-                    LOGGER.info(data, schema_dict)
                     rec = transformer.transform(data, schema_dict)
 
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
@@ -178,7 +178,6 @@ class FinancialReportStream(Stream):
     report_date_format = '%Y-%m'
 
     def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
-        LOGGER.info(f"Downloading financial report for {report_filters['reportDate']}")
         # fetch data from appstore api
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
