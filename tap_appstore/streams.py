@@ -185,11 +185,10 @@ class FinancialReportStream(Stream):
     report_date_format = '%Y-%m'
 
     def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
-        # fetch data from appstore api
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
         except APIError as e:
-            raise Exception(f'Error during download report attempt {e}')
+            raise Exception(f'Error during download report {self.name}.\n{e}')
 
         return self.parse_api_response(rep_tsv)
 
