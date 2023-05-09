@@ -95,6 +95,7 @@ class Stream:
         pass
 
     def get_report(self, report_date: datetime):
+        LOGGER.info("Requesting Appstore data for: %s on %s", self.name, report_date.strftime(self.report_date_format))
         filters = self.get_api_request_fields(report_date)
         return self._attempt_download_report(filters)
 
