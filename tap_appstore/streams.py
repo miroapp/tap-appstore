@@ -141,6 +141,7 @@ class Stream:
                         '_api_report_date': iterator.strftime(self.report_date_format),
                         **line
                     }
+                    LOGGER.info(data, schema_dict)
                     rec = transformer.transform(data, schema_dict)
 
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
