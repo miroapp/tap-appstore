@@ -178,6 +178,7 @@ class FinancialReportStream(Stream):
     report_date_format = '%Y-%m'
 
     def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+        LOGGER.info(f"Downloading financial report for {report_filters['reportDate']}")
         # fetch data from appstore api
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
