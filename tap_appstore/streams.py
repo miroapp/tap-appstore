@@ -166,8 +166,7 @@ class SalesReportStream(Stream):
         try:
             rep_tsv = self.api.download_sales_and_trends_reports(filters=report_filters)
         except APIError as e:
-            LOGGER.error(e)
-            return None
+            raise Exception(f'Error during download report attempt {e}')
 
         return self.parse_api_response(rep_tsv)
 
@@ -190,8 +189,7 @@ class FinancialReportStream(Stream):
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
         except APIError as e:
-            LOGGER.error(e)
-            return None
+            raise Exception(f'Error during download report attempt {e}')
 
         return self.parse_api_response(rep_tsv)
 
