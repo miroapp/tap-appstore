@@ -1,12 +1,11 @@
 from datetime import datetime
-from typing import Dict, Union, List, Tuple
+from typing import Dict, Union, List
 
 import singer
-from dateutil.relativedelta import relativedelta
-from singer import Transformer, CatalogEntry
-
-from appstoreconnect.api import APIError
 from appstoreconnect import Api
+from appstoreconnect.api import APIError
+from dateutil.relativedelta import relativedelta
+from singer import Transformer
 
 LOGGER = singer.get_logger()
 

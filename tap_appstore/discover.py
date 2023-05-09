@@ -1,7 +1,7 @@
 import singer
-from singer.catalog import Catalog, CatalogEntry, Schema
 from appstoreconnect import Api
 from appstoreconnect.api import APIError
+from singer.catalog import Catalog, CatalogEntry
 
 from tap_appstore.schema import load_schemas
 from tap_appstore.streams import STREAMS
