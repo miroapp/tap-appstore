@@ -87,7 +87,7 @@ class Stream:
             'vendorNumber': f"{self.vendor}"
         }
 
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
         """
         Attempt to download the report from the API. If the API returns an error, log it and return None.
         """
@@ -162,7 +162,7 @@ class Stream:
 
 
 class SalesReportStream(Stream):
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
         try:
             rep_tsv = self.api.download_sales_and_trends_reports(filters=report_filters)
         except APIError as e:
@@ -184,7 +184,7 @@ class FinancialReportStream(Stream):
     delta = relativedelta(months=1)
     report_date_format = '%Y-%m'
 
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
         # fetch data from appstore api
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
