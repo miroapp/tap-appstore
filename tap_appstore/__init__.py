@@ -25,7 +25,7 @@ def main():
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
 
     config = args.config
-    client = Api(config['key_id'], config['key_file'], config['issuer_id'])
+    client = Api(config['key_id'], config['key_file'], config['issuer_id'], submit_stats=False)
 
     state = {}
     if args.state:
