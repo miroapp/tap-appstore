@@ -3,7 +3,7 @@ import json
 
 import singer
 from appstoreconnect import Api
-from singer import utils
+from singer import utils, Catalog
 
 from tap_appstore.discover import discover, do_discover
 from tap_appstore.sync import sync
@@ -36,7 +36,7 @@ def main():
         catalog = do_discover(client)
         print(json.dumps(catalog.to_dict(), indent=2))
     else:
-        catalog = args.catalog if args.catalog else do_discover(client)
+        catalog = Catalog.from_dict(args.properties) if args.properties else do_discover(client)
         sync(client, config, state, catalog)
 
 
