@@ -87,7 +87,7 @@ class Stream:
             'vendorNumber': f"{self.vendor}"
         }
 
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
         """
         Attempt to download the report from the API. If the API returns an error, log it and return None.
         """
@@ -133,6 +133,8 @@ class Stream:
                 # setting report filters for each stream
                 rep = self.get_report(iterator)
 
+                if not rep:
+                    break
                 # write records
                 for index, line in enumerate(rep, start=1):
                     if self.skip_line(line):
@@ -160,11 +162,12 @@ class Stream:
 
 
 class SalesReportStream(Stream):
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
         try:
             rep_tsv = self.api.download_sales_and_trends_reports(filters=report_filters)
         except APIError as e:
-            raise Exception(f'Error during download report attempt {e}')
+            LOGGER.error(f'Error during download report {self.name}.\n{e}')
+            return None
 
         return self.parse_api_response(rep_tsv)
 
@@ -182,11 +185,12 @@ class FinancialReportStream(Stream):
     delta = relativedelta(months=1)
     report_date_format = '%Y-%m'
 
-    def _attempt_download_report(self, report_filters: Dict[str, any]) -> List[Dict]:
+    def _attempt_download_report(self, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
         try:
             rep_tsv = self.api.download_finance_reports(filters=report_filters)
         except APIError as e:
-            raise Exception(f'Error during download report {self.name}.\n{e}')
+            LOGGER.error(f'Error during download report {self.name}.\n{e}')
+            return None
 
         return self.parse_api_response(rep_tsv)
 
