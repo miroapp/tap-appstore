@@ -23,6 +23,7 @@ LOGGER = singer.get_logger()
 def main():
     # Parse command line arguments
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
+    LOGGER.info("Starting tap-appstore args \n%s", args)
 
     config = args.config
     client = Api(config['key_id'], config['key_file'], config['issuer_id'], submit_stats=False)
