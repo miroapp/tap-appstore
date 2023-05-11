@@ -13,9 +13,9 @@ def get_selected_streams(catalog: Catalog) -> List[CatalogEntry]:
     for stream in catalog.streams:
         for entry in stream.metadata:
             # Stream metadata will have an empty breadcrumb
-            LOGGER.info(entry['metadata'])
             if not entry['breadcrumb'] and entry['metadata'].get('selected', None):
                 selected_streams.append(stream)
+    LOGGER.info("Selected streams %s", selected_streams)
     return selected_streams
 
 
