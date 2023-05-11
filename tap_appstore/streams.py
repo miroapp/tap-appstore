@@ -152,7 +152,6 @@ class Stream:
 
                 singer.write_state(self.state)
                 iterator += self.delta
-        singer.write_state(self.state)
 
     def skip_line(self, line: Dict) -> bool:
         """
