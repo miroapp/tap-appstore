@@ -145,10 +145,7 @@ class Stream:
                         **line
                     }
                     rec = transformer.transform(data, schema_dict)
-                    LOGGER.info("Writing record %s", rec)
-
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
-
                 self.update_bookmark(iterator + self.delta)
 
                 singer.write_state(self.state)
