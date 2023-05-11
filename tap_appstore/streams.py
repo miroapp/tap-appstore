@@ -78,6 +78,7 @@ class Stream:
         return datetime.strptime(bookmark, DATE_FORMAT)
 
     def update_bookmark(self, value: datetime):
+        LOGGER.info("Updating bookmark for %s to %s, state %s", self.name, value.strftime(DATE_FORMAT), self.state)
         singer.write_bookmark(self.state, self.name, 'start_date', value.strftime(DATE_FORMAT))
 
     def get_api_request_fields(self, report_date: datetime) -> Dict[str, any]:
