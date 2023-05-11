@@ -36,9 +36,13 @@ def main():
     if args.discover:
         catalog = do_discover(client)
         print(json.dumps(catalog.to_dict(), indent=2))
-    else:
-        catalog = Catalog.from_dict(args.properties) if args.properties else do_discover(client)
+    elif args.catalog:
+        sync(client, config, state, args.catalog)
+    elif args.properties:
+        catalog = Catalog.from_dict(args.properties)
         sync(client, config, state, catalog)
+    else:
+        LOGGER.info("No properties were selected")
 
 
 if __name__ == '__main__':
