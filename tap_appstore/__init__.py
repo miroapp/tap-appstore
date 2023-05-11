@@ -32,17 +32,18 @@ def main():
     if args.state:
         state = args.state
 
-    # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
+        # If discover flag was passed, run discovery mode and dump output to stdout
         catalog = do_discover(client)
         print(json.dumps(catalog.to_dict(), indent=2))
-    elif args.catalog:
-        sync(client, config, state, args.catalog)
     elif args.properties:
         catalog = Catalog.from_dict(args.properties)
         sync(client, config, state, catalog)
+    elif args.catalog:
+        sync(client, config, state, args.catalog)
     else:
-        LOGGER.info("No properties were selected")
+        catalog = do_discover(client)
+        sync(client, config, state, catalog)
 
 
 if __name__ == '__main__':
