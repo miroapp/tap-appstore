@@ -15,7 +15,6 @@ def get_selected_streams(catalog: Catalog) -> List[CatalogEntry]:
             # Stream metadata will have an empty breadcrumb
             if not entry['breadcrumb'] and entry['metadata'].get('selected', None):
                 selected_streams.append(stream)
-    LOGGER.info("Selected streams %s", selected_streams)
     return selected_streams
 
 
@@ -25,6 +24,5 @@ def sync(client: Api, config, state, catalog: Catalog):
         stream_name = catalog_entry.tap_stream_id
         schema_dict = catalog_entry.schema.to_dict()
         stream_obj = STREAMS[stream_name](stream_name, client, config, state)
-        LOGGER.info("Syncing stream %s, dict %s, key_properties %s", stream_name, schema_dict, catalog_entry.key_properties)
         singer.write_schema(stream_name, schema_dict, catalog_entry.key_properties)
         stream_obj.query_report(schema_dict)
