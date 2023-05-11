@@ -20,6 +20,7 @@ def get_selected_streams(catalog: Catalog) -> List[CatalogEntry]:
 
 def sync(client: Api, config, state, catalog: Catalog):
     for catalog_entry in get_selected_streams(catalog):
+        LOGGER.info("Syncing stream %s", catalog_entry.tap_stream_id)
         stream_name = catalog_entry.tap_stream_id
         schema_dict = catalog_entry.schema.to_dict()
         stream_obj = STREAMS[stream_name](stream_name, client, config, state)
