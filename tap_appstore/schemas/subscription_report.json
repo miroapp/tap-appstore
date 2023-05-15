@@ -24,6 +24,12 @@
             ],
             "format" : "date"
         },
+        "vendor_number": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
         "app_name": {
             "type": [
                 "null",
