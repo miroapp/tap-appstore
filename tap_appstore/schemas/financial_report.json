@@ -24,6 +24,12 @@
             ],
             "format" : "date"
         },
+        "vendor_identifier": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
         "vendor_number": {
             "type": [
                 "null",
@@ -51,6 +57,12 @@
             ]
         },
         "partner_share": {
+            "type": [
+                "null",
+                "number"
+            ]
+        },
+        "extended_partner_share": {
             "type": [
                 "null",
                 "number"
