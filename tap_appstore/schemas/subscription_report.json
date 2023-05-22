@@ -141,7 +141,7 @@
         "subscribers": {
             "type": [
                 "null",
-                "integer"
+                "string"
             ]
         },
         "country": {
