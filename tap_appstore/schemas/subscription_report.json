@@ -39,10 +39,16 @@
         "app_apple_id": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "subscription_name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        "subscription_offer_name": {
             "type": [
                 "null",
                 "string"
@@ -81,7 +87,7 @@
         "customer_price": {
             "type": [
                 "null",
-                "string"
+                "number"
             ]
         },
         "customer_currency": {
@@ -93,7 +99,7 @@
         "developer_proceeds": {
             "type": [
                 "null",
-                "string"
+                "number"
             ]
         },
         "proceeds_currency": {
@@ -132,6 +138,12 @@
                 "string"
             ]
         },
+        "subscribers": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
         "country": {
             "type": [
                 "null",
@@ -162,13 +174,31 @@
                 "integer"
             ]
         },
+        "free_trial_offer_code_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
         "free_trial_promotional_offer_subscriptions": {
             "type": [
                 "null",
                 "integer"
             ]
         },
+        "pay_as_you_go_offer_code_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
         "pay_up_front_promotional_offer_subscriptions": {
+            "type": [
+                "null",
+                "integer"
+            ]
+        },
+        "pay_up_front_offer_code_subscriptions": {
             "type": [
                 "null",
                 "integer"
