@@ -136,7 +136,7 @@
         "paid_service_days_recovered": {
             "type": [
                 "null",
-                "integer"
+                "string"
             ]
         },
         "original_start_date": {
