@@ -52,7 +52,7 @@
         "app_apple_id": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "subscription_name": {
@@ -64,13 +64,13 @@
         "subscription_apple_id": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "subscription_group_id": {
             "type": [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "standard_subscription_duration": {
@@ -131,6 +131,12 @@
             "type": [
                 "null",
                 "integer"
+            ]
+        },
+        "paid_service_days_recovered": {
+            "type": [
+                "null",
+                "string"
             ]
         },
         "original_start_date": {
