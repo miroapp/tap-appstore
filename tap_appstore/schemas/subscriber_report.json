@@ -46,7 +46,7 @@
         "app_apple_id" : {
             "type" : [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "subscription_name" : {
@@ -58,13 +58,13 @@
         "subscription_apple_id" : {
             "type" : [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "subscription_group_id" : {
             "type" : [
                 "null",
-                "string"
+                "integer"
             ]
         },
         "standard_subscription_duration" : {
@@ -106,7 +106,7 @@
         "customer_price" : {
             "type" : [
                 "null",
-                "string"
+                "number"
             ]
         },
         "customer_currency" : {
@@ -118,7 +118,7 @@
         "developer_proceeds" : {
             "type" : [
                 "null",
-                "string"
+                "number"
             ]
         },
         "proceeds_currency" : {
