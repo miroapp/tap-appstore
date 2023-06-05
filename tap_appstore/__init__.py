@@ -6,6 +6,7 @@ import os
 import tempfile
 import json
 from typing import Dict, Union, List
+from singer.utils import strptime_to_utc, strftime
 
 import singer
 from singer import utils, metadata, Transformer
@@ -218,7 +219,13 @@ def query_report(api: Api, catalog_entry):
         iterator.strftime(BOOKMARK_DATE_FORMAT)
     )
 
-    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
+    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:           
+        iterator = strptime_to_utc(iterator)
+        now= utils.now()
+        delta_days = (now - iterator).days
+        if delta_days>=365:
+            delta_days = 365
+            iterator = now - timedelta(days=delta_days)
         while iterator + delta <= extraction_time:
             report_date = iterator.strftime("%Y-%m-%d")
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
