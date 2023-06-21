@@ -146,7 +146,6 @@ class Stream:
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
                 iterator += self.delta
                 self.update_bookmark(iterator)
-
                 singer.write_state(self.state)
 
     def skip_line(self, line: Dict) -> bool:
