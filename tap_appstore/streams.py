@@ -129,14 +129,10 @@ class Stream:
         self.update_bookmark(iterator)
 
         with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
-            while iterator + self.delta <= extraction_time:
-                # setting report filters for each stream
-                rep = self.get_report(iterator)
-
-                if not rep:
-                    break
+            # setting report filters for each stream
+            while report := self.get_report(iterator):
                 # write records
-                for index, line in enumerate(rep, start=1):
+                for index, line in enumerate(report, start=1):
                     if self.skip_line(line):
                         continue
                     data = {
@@ -148,10 +144,9 @@ class Stream:
                     }
                     rec = transformer.transform(data, schema_dict)
                     singer.write_record(self.name, rec, time_extracted=extraction_time)
-                self.update_bookmark(iterator + self.delta)
-
-                singer.write_state(self.state)
                 iterator += self.delta
+                self.update_bookmark(iterator)
+                singer.write_state(self.state)
 
     def skip_line(self, line: Dict) -> bool:
         """
