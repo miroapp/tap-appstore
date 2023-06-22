@@ -15,6 +15,11 @@ setup(name='tap-appstore',
           'pytz==2023.3',
           'python-dateutil>=2.8.2,<3.0.0'
       ],
+      extras_require={
+        "dev": [
+            "pytest<8.0.0",
+        ]
+      },
       entry_points='''
           [console_scripts]
           tap-appstore=tap_appstore:main
