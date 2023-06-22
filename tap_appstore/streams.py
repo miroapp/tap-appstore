@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Union, List
 
 import singer
