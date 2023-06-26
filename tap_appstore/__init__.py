@@ -120,7 +120,7 @@ def discover(api: Api):
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
         filters = get_api_request_fields(report_date, schema_name)
         mdata = metadata.new()
-
+        
         report = _attempt_download_report(api, filters)
         if report:
             # create metadata
@@ -208,7 +208,7 @@ def query_report(api: Api, catalog_entry):
     stream_schema = catalog_entry['schema']
 
     # get bookmark from when data will be pulled
-    bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
+    bookmark = strptime_to_utc(get_bookmark(stream_name)).astimezone()
     delta = timedelta(days=1)
     extraction_time = singer.utils.now().astimezone()
     iterator = bookmark
@@ -220,7 +220,6 @@ def query_report(api: Api, catalog_entry):
     )
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:           
-        iterator = strptime_to_utc(iterator)
         now= utils.now()
         delta_days = (now - iterator).days
         if delta_days>=365:
