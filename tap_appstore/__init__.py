@@ -123,6 +123,9 @@ def discover(api: Api):
         
         report = _attempt_download_report(api, filters)
         if report:
+            # add entry for the stream itself
+            metadata.write(mdata, (), 'inclusion', 'available')
+
             # create metadata
             for field in schema["properties"]:
                 mdata = metadata.write(mdata, ('properties', field), 'inclusion', 'available')
@@ -180,6 +183,11 @@ def sync(api: Api):
     # Write all schemas and init count to 0
     for catalog_entry in Context.catalog['streams']:
         stream_name = catalog_entry["tap_stream_id"]
+        if not Context.is_selected(stream_name):
+            LOGGER.info(f"Skipping {stream_name} as it is deselected")
+            continue
+
+        LOGGER.info(f"Starting sync for {stream_name}")
         singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
 
         Context.new_counts[stream_name] = 0
