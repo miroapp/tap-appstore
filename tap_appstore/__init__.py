@@ -3,8 +3,10 @@
 from datetime import datetime
 from datetime import timedelta
 import os
+import tempfile
 import json
 from typing import Dict, Union, List
+from singer.utils import strptime_to_utc, strftime
 
 import singer
 from singer import utils, metadata, Transformer
@@ -15,7 +17,6 @@ import pytz
 
 REQUIRED_CONFIG_KEYS = [
     'key_id',
-    'key_file',
     'issuer_id',
     'vendor',
     'start_date'
@@ -39,7 +40,7 @@ API_REQUEST_FIELDS = {
         'reportType': 'SUBSCRIBER',
         'frequency': 'DAILY',
         'reportSubType': 'DETAILED',
-        'version': '1_2'
+        'version': '1_3'
     },
     'subscription_report': {
         'reportType': 'SUBSCRIPTION',
@@ -118,15 +119,24 @@ def discover(api: Api):
     for schema_name, schema in raw_schemas.items():
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
         filters = get_api_request_fields(report_date, schema_name)
-
+        mdata = metadata.new()
+        
         report = _attempt_download_report(api, filters)
         if report:
+            # add entry for the stream itself
+            metadata.write(mdata, (), 'inclusion', 'available')
+
+            # create metadata
+            for field in schema["properties"]:
+                mdata = metadata.write(mdata, ('properties', field), 'inclusion', 'available')
+            
             # create and add catalog entry
             catalog_entry = {
                 'stream': schema_name,
                 'tap_stream_id': schema_name,
                 'schema': schema,
-                'key_properties': []
+                'key_properties': [],
+                'metadata': metadata.to_list(mdata)
             }
             streams.append(catalog_entry)
 
@@ -173,6 +183,11 @@ def sync(api: Api):
     # Write all schemas and init count to 0
     for catalog_entry in Context.catalog['streams']:
         stream_name = catalog_entry["tap_stream_id"]
+        if not Context.is_selected(stream_name):
+            LOGGER.info(f"Skipping {stream_name} as it is deselected")
+            continue
+
+        LOGGER.info(f"Starting sync for {stream_name}")
         singer.write_schema(stream_name, catalog_entry['schema'], catalog_entry['key_properties'])
 
         Context.new_counts[stream_name] = 0
@@ -201,7 +216,7 @@ def query_report(api: Api, catalog_entry):
     stream_schema = catalog_entry['schema']
 
     # get bookmark from when data will be pulled
-    bookmark = datetime.strptime(get_bookmark(stream_name), "%Y-%m-%dT%H:%M:%SZ").astimezone()
+    bookmark = strptime_to_utc(get_bookmark(stream_name)).astimezone()
     delta = timedelta(days=1)
     extraction_time = singer.utils.now().astimezone()
     iterator = bookmark
@@ -212,13 +227,22 @@ def query_report(api: Api, catalog_entry):
         iterator.strftime(BOOKMARK_DATE_FORMAT)
     )
 
-    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
+    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:           
+        now= utils.now()
+        delta_days = (now - iterator).days
+        if delta_days>=365:
+            delta_days = 365
+            iterator = now - timedelta(days=delta_days)
         while iterator + delta <= extraction_time:
             report_date = iterator.strftime("%Y-%m-%d")
             LOGGER.info("Requesting Appstore data for: %s on %s", stream_name, report_date)
             # setting report filters for each stream
             report_filters = get_api_request_fields(report_date, stream_name)
             rep = _attempt_download_report(api, report_filters)
+
+            if rep is None:
+                iterator += delta
+                continue
 
             # write records
             for index, line in enumerate(rep, start=1):
@@ -260,8 +284,13 @@ def get_bookmark(name):
 def main():
     # Parse command line arguments
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
-
     Context.config = args.config
+
+    if Context.config.get('private_key'):
+        with tempfile.NamedTemporaryFile("w", delete=False) as fp:
+            fp.write(Context.config['private_key'])
+            Context.config['key_file'] = fp.name
+    
     api = Api(
         Context.config['key_id'],
         Context.config['key_file'],
