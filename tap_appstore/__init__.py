@@ -40,7 +40,7 @@ API_REQUEST_FIELDS = {
         'reportType': 'SUBSCRIBER',
         'frequency': 'DAILY',
         'reportSubType': 'DETAILED',
-        'version': '1_2'
+        'version': '1_3'
     },
     'subscription_report': {
         'reportType': 'SUBSCRIPTION',
