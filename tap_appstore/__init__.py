@@ -113,15 +113,51 @@ def load_schemas():
     return schemas
 
 
+
+
+def _attempt_download_report(api: Api, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
+    # fetch data from appstore api
+    try:
+        rep_tsv = api.download_sales_and_trends_reports(filters=report_filters)
+    except APIError as e:
+        LOGGER.error(f"Failed downloading report for date {report_filters['reportDate']}: {e}")
+        return None
+
+    # parse api response
+    if isinstance(rep_tsv, dict):
+        LOGGER.warning(f"Received a JSON response instead of the report: {rep_tsv}")
+    else:
+        return tsv_to_list(rep_tsv)
+
+def get_first_valid_report(api, start_date, report_filters, stream_name):
+    report_filters = get_api_request_fields(start_date, stream_name)
+    rep = _attempt_download_report(api, report_filters)
+
+    if rep is None:
+        LOGGER.info("Start Date didn't return a valid report, trying today minus 365 days")
+    
+    today = utils.now()
+    days = 0
+    i = 0
+    while rep is None and days < 365:
+        query_date = today - timedelta(days=days)
+        report_filters = get_api_request_fields(query_date.strftime("%Y-%m-%d"), stream_name)
+        rep = _attempt_download_report(api, report_filters)
+        days += 30
+        i += 1
+    
+    return rep
+
 def discover(api: Api):
     raw_schemas = load_schemas()
     streams = []
     for schema_name, schema in raw_schemas.items():
+        LOGGER.info(f"Fetching {schema_name} schema")
         report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
         filters = get_api_request_fields(report_date, schema_name)
         mdata = metadata.new()
-        
-        report = _attempt_download_report(api, filters)
+        report = get_first_valid_report(api, report_date, filters, schema_name)
+        # report = _attempt_download_report(api, filters)
         if report:
             # add entry for the stream itself
             metadata.write(mdata, (), 'inclusion', 'available')
@@ -195,22 +231,6 @@ def sync(api: Api):
 
         query_report(api, catalog_entry)
 
-
-def _attempt_download_report(api: Api, report_filters: Dict[str, any]) -> Union[List[Dict], None]:
-    # fetch data from appstore api
-    try:
-        rep_tsv = api.download_sales_and_trends_reports(filters=report_filters)
-    except APIError as e:
-        LOGGER.error(e)
-        return None
-
-    # parse api response
-    if isinstance(rep_tsv, dict):
-        LOGGER.warning(f"Received a JSON response instead of the report: {rep_tsv}")
-    else:
-        return tsv_to_list(rep_tsv)
-
-
 def query_report(api: Api, catalog_entry):
     stream_name = catalog_entry["tap_stream_id"]
     stream_schema = catalog_entry['schema']
@@ -228,7 +248,7 @@ def query_report(api: Api, catalog_entry):
     )
 
     with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:           
-        now= utils.now()
+        now = utils.now()
         delta_days = (now - iterator).days
         if delta_days>=365:
             delta_days = 365
