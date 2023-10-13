@@ -117,28 +117,23 @@ def discover(api: Api):
     raw_schemas = load_schemas()
     streams = []
     for schema_name, schema in raw_schemas.items():
-        report_date = datetime.strptime(get_bookmark(schema_name), "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d")
-        filters = get_api_request_fields(report_date, schema_name)
         mdata = metadata.new()
-        
-        report = _attempt_download_report(api, filters)
-        if report:
-            # add entry for the stream itself
-            metadata.write(mdata, (), 'inclusion', 'available')
 
-            # create metadata
-            for field in schema["properties"]:
-                mdata = metadata.write(mdata, ('properties', field), 'inclusion', 'available')
-            
-            # create and add catalog entry
-            catalog_entry = {
-                'stream': schema_name,
-                'tap_stream_id': schema_name,
-                'schema': schema,
-                'key_properties': [],
-                'metadata': metadata.to_list(mdata)
-            }
-            streams.append(catalog_entry)
+        metadata.write(mdata, (), 'inclusion', 'available')
+
+        # create metadata
+        for field in schema["properties"]:
+            mdata = metadata.write(mdata, ('properties', field), 'inclusion', 'available')
+
+        # create and add catalog entry
+        catalog_entry = {
+            'stream': schema_name,
+            'tap_stream_id': schema_name,
+            'schema': schema,
+            'key_properties': [],
+            'metadata': metadata.to_list(mdata)
+        }
+        streams.append(catalog_entry)
 
     if len(streams) == 0:
         LOGGER.warning("Could not find any reports types to download for the input configuration.")
@@ -227,7 +222,7 @@ def query_report(api: Api, catalog_entry):
         iterator.strftime(BOOKMARK_DATE_FORMAT)
     )
 
-    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:           
+    with Transformer(singer.UNIX_SECONDS_INTEGER_DATETIME_PARSING) as transformer:
         now= utils.now()
         delta_days = (now - iterator).days
         if delta_days>=365:
@@ -290,7 +285,7 @@ def main():
         with tempfile.NamedTemporaryFile("w", delete=False) as fp:
             fp.write(Context.config['private_key'])
             Context.config['key_file'] = fp.name
-    
+
     api = Api(
         Context.config['key_id'],
         Context.config['key_file'],
